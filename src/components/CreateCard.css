@@ -1,0 +1,99 @@
+.create-card-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.create-card-form {
+  background-color: #2a3a6e;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.create-card-form h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #c0c8e7;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #4a5a8e;
+  background-color: #1e2a5a;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #7a9dff;
+  box-shadow: 0 0 0 3px rgba(122, 157, 255, 0.3);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.create-card-form button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #7a9dff;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.create-card-form button:hover:not(:disabled) {
+  background-color: #6a8cff;
+}
+
+.create-card-form button:disabled {
+  background-color: #4a5a8e;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.back-link-form {
+  text-align: center;
+  color: #c0c8e7;
+  text-decoration: none;
+  margin-top: 10px;
+}
+
+.back-link-form:hover {
+  text-decoration: underline;
+}
