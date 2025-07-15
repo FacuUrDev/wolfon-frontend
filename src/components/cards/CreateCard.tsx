@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { createCard } from '../api';
+  import { createCard } from '../../api';
 import './CreateCard.css';
 
 function CreateCard() {
-  const { userId } = useParams<{ userId: string }>();
+  const { _id: userId } = useParams<{ _id: string }>();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -59,9 +59,8 @@ function CreateCard() {
             id="title"
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={e => setTitle(e.target.value)}
             disabled={loading}
-            required
           />
         </div>
         <div className="form-group">
@@ -69,17 +68,18 @@ function CreateCard() {
           <textarea
             id="description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={e => setDescription(e.target.value)}
             disabled={loading}
           />
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Creando...' : 'Crear Tarjeta'}
+        <button type="submit" className="submit-btn" disabled={loading}>
+          {loading ? 'Creando...' : 'Crear'}
         </button>
-        <Link to={`/users/${userId}/cards`} className="back-link-form">← Cancelar</Link>
+        <Link to={`/users/${userId}/cards`} className="back-link">Volver a las tarjetas</Link>
       </form>
     </div>
   );
 }
 
 export default CreateCard;
+// ...mueve el contenido de CreateCard.tsx aquí...

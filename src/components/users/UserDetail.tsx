@@ -1,29 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { fetchUserById, type User } from '../api';
+import { fetchUserById, type User } from '../../api';
 import './UserDetail.css';
 
 function UserDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { _id } = useParams<{ _id: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!_id) return;
 
     const getUser = async () => {
       try {
         setLoading(true);
         // La API devuelve un objeto con `_id`.
-        const dataFromApi: any = await fetchUserById(id);
-        // Mapeamos `_id` a `id` para que sea consistente, usando `id` si existe, o `_id` como fallback.
-        const formattedUser = { ...dataFromApi, id: dataFromApi.id || dataFromApi._id };
+        const dataFromApi: any = await fetchUserById(_id);
+        // Mapeamos `_id` a `id` para que sea consistente, usando _id como id.
+        const formattedUser = { ...dataFromApi, id: dataFromApi._id };
         setUser(formattedUser);
         setError(null);
       } catch (err: any) {
         if (err.response && err.response.status === 404) {
-          setError(`El usuario con ID: ${id} no fue encontrado. Por favor, verifica que el ID es correcto.`);
+          setError(`El usuario con _id: ${_id} no fue encontrado. Por favor, verifica que el _id es correcto.`);
         } else {
           // Para otros errores (red, error del servidor, etc.)
           setError('Ocurrió un error al cargar los detalles del usuario.');
@@ -35,7 +35,7 @@ function UserDetail() {
     };
 
     getUser();
-  }, [id]);
+  }, [_id]);
 
   if (loading) return <p>Cargando detalles del usuario...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
@@ -51,7 +51,7 @@ function UserDetail() {
           <p className="user-email">{user?.email}</p>
           <p className="user-id">ID: {user?.id}</p>
         </div>
-        <Link to={`/users/${user?.id}/cards`} className="action-link">Ver tarjetas de este usuario →</Link>
+        <Link to={`/users/${user?._id}/cards`} className="action-link">Ver tarjetas de este usuario →</Link>
 
       </div>
     </div>
