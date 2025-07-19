@@ -1,0 +1,23 @@
+.home-container {
+  position: relative;
+  padding: 80px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  color: #ffffff;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  z-index: 2;
+  margin-top: 56px;
+}
+.home-container h1 {
+   font-size: 5.4rem;
+  font-weight: 800;
+  margin-bottom: 30px;
+  text-align: center;
+  font-family:"inter",sans-serif;
+}
+.home-container p {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+  text-align: justify;
+}

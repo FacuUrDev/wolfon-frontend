@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchCardsByUserId, type Card } from '../../api/cards';
+import InlineCardEdit from './InlineCardEdit';
 import './CardList.css';
 
 function CardList() {
@@ -8,6 +9,7 @@ function CardList() {
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -15,10 +17,8 @@ function CardList() {
     const getCards = async () => {
       try {
         setLoading(true);
-        // La API devuelve un array de objetos con `_id`.
         const dataFromApi: any[] = await fetchCardsByUserId(userId);
-        // Mapeamos cada tarjeta para que tenga la propiedad `id`, usando `id` si existe, o `_id` como fallback.
-        const formattedCards = dataFromApi.map(card => ({ ...card, id: card.id || card._id }));
+        const formattedCards = dataFromApi.map((card: any) => ({ ...card, id: card.id || card._id }));
         setCards(formattedCards);
         setError(null);
       } catch (err) {
@@ -31,17 +31,31 @@ function CardList() {
     getCards();
   }, [userId]);
 
-  // Handler para eliminar tarjeta
   const handleDelete = async (cardId: string) => {
     if (!window.confirm('¿Seguro que deseas eliminar esta tarjeta?')) return;
     try {
-      // Aquí deberías llamar a la API para eliminar la tarjeta
-      // await deleteCard(cardId);
-      setCards(prev => prev.filter(card => card.id !== cardId));
+      setCards((prev: Card[]) => prev.filter((card: Card) => card.id !== cardId));
     } catch (err) {
       alert('Error al eliminar la tarjeta');
       console.error(err);
     }
+  };
+
+  const startEditing = (card: Card) => {
+    setEditingId(card.id);
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+  };
+
+  const saveEdit = (cardId: string, title: string, description: string) => {
+    setCards((prev: Card[]) =>
+      prev.map((card: Card) =>
+        card.id === cardId ? { ...card, title, description } : card
+      )
+    );
+    setEditingId(null);
   };
 
   return (
@@ -52,7 +66,7 @@ function CardList() {
       </div>
       {cards.length > 0 ? (
         <div className="cards-grid">
-          {cards.map((card) => (
+          {cards.map((card: Card) => (
             <div key={card.id} className="card-item" style={{ position: 'relative' }}>
               <button
                 className="delete-card-btn"
@@ -67,10 +81,31 @@ function CardList() {
                   <line x1="14" y1="11" x2="14" y2="17" />
                 </svg>
               </button>
-              <Link to={`/cards/${card.id}`} className="card-item-link" style={{ display: 'block' }}>
-                <h2>{card.title}</h2>
-                <p>{card.description}</p>
-              </Link>
+              {/* Botón editar */}
+              <button
+                className="edit-card-btn"
+                style={{ position: 'absolute', top: 8, left: 8, background: 'none', border: 'none', cursor: 'pointer', zIndex: 2 }}
+                title="Editar tarjeta"
+                onClick={() => startEditing(card)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                </svg>
+              </button>
+              {/* Edición inline desde componente externo */}
+              {editingId === card.id ? (
+                <InlineCardEdit
+                  card={card}
+                  onSave={saveEdit}
+                  onCancel={cancelEditing}
+                />
+              ) : (
+                <Link to={`/cards/${card.id}`} className="card-item-link" style={{ display: 'block' }}>
+                  <h2>{card.title}</h2>
+                  <p>{card.description}</p>
+                </Link>
+              )}
             </div>
           ))}
         </div>
