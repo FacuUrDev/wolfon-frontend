@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchUserById, type User } from '../../api';
 import './UserDetail.css';
+import UserSubscription from './UserSubscription';
 
 function UserDetail() {
   const { _id } = useParams<{ _id: string }>();
@@ -51,8 +52,12 @@ function UserDetail() {
           <p className="user-email">{user?.email}</p>
           <p className="user-id">ID: {user?.id}</p>
         </div>
+        <UserSubscription
+          userId={user?._id || user?.id}
+          currentTier={user?.subscription?.tier}
+          onSubscribed={() => _id && fetchUserById(_id).then(u => setUser({ ...u, id: u._id }))}
+        />
         <Link to={`/users/${user?._id}/cards`} className="action-link">Ver tarjetas de este usuario →</Link>
-
       </div>
     </div>
   );
