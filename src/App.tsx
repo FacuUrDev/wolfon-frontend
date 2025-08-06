@@ -5,6 +5,7 @@ import UserDetail from './components/users/UserDetail';
 import CardDetail from './components/cards/CardDetail';
 import CardList from './components/cards/CardList';
 import CreateCard from './components/cards/CreateCard';
+import CardTemplateManager from './components/cards/CardTemplateManager';
 import Layout from './components/common/Layout';
 import Home from './pages/Home';
 
@@ -21,6 +22,8 @@ function App() {
         <Route path="/users/:_id/cards" element={<CardList />} />
         {/* Ruta para crear una nueva tarjeta para un usuario */}
         <Route path="/users/:_id/cards/new" element={<CreateCard />} />
+        {/* Vista de gestión de plantillas de tarjetas */}
+        <Route path="/cards/templates" element={<CardTemplateManager />} />
         {/* Opcional: Mantenemos la lista de usuarios en una ruta diferente */}
         <Route path="/users/list" element={<UserList />} />
       </Routes>

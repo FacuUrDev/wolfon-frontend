@@ -95,9 +95,12 @@ function CardList() {
 
   return (
     <div className="card-list-container">
-      <div className="card-list-header">
+      <div className="card-list-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <h1>Tarjetas del Usuario{user ? `: ${user.name}` : ''}</h1>
-        <Link to={`/users/${userId}/cards/new`} className="create-card-button">Crear Tarjeta</Link>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <Link to={`/users/${userId}/cards/new`} className="create-card-button">Crear Tarjeta</Link>
+          <Link to="/cards/templates" className="edit-templates-button" style={{ background: '#1976d2', color: '#fff', padding: '8px 16px', borderRadius: 6, textDecoration: 'none', fontWeight: 500 }}>Editar plantillas</Link>
+        </div>
       </div>
       <div style={{ margin: '16px 0', display: 'flex', gap: 16, alignItems: 'center' }}>
         <label>
@@ -152,6 +155,27 @@ function CardList() {
                 <Link to={`/cards/${card.id}`} className="card-item-link" style={{ display: 'block' }}>
                   <h2>{card.title}</h2>
                   <p>{card.description}</p>
+                  {/* Visualización de atributos adicionales */}
+                  <table className="card-attr-table">
+                    <tbody>
+                      {Object.entries(card)
+                        .filter(([key]) => !['id', '_id', 'title', 'description', 'user_id', 'created_at', 'updated_at', '__v'].includes(key))
+                        .map(([key, value]) => (
+                          <tr key={key}>
+                            <td className="attr-key">{key}</td>
+                            <td>
+                              <span className={
+                                key === 'precio' || key === 'kg' || key === 'stock' ? 'badge badge-num' :
+                                key === 'vencimiento' ? 'badge badge-date' :
+                                'badge'
+                              }>
+                                {value}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
                 </Link>
               )}
             </div>

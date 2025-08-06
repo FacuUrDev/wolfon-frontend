@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-  import { createCard } from '../../api';
+import { createCard } from '../../api';
+import { cardTemplates } from './cardTemplates';
 import './CreateCard.css';
 
 function CreateCard() {
@@ -8,16 +9,28 @@ function CreateCard() {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  // Campos dinámicos
-  const [fields, setFields] = useState([{ key: '', value: '' }]);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+  // Campos dinámicos: key, value, type, label
+  const [fields, setFields] = useState<{ key: string, value: string, type?: string, label?: string }[]>([{ key: '', value: '', type: 'text' }]);
+
+  // Cambiar plantilla
+  const handleTemplateChange = (templateName: string) => {
+    setSelectedTemplate(templateName);
+    const template = cardTemplates.find(t => t.name === templateName);
+    if (template) {
+      setFields(template.fields.map(f => ({ ...f, value: '' })));
+    } else {
+      setFields([{ key: '', value: '', type: 'text' }]);
+    }
+  };
 
   // Agregar un nuevo campo dinámico
-  const addField = () => setFields([...fields, { key: '', value: '' }]);
+  const addField = () => setFields([...fields, { key: '', value: '', type: 'text' }]);
 
   // Editar un campo dinámico
   const handleFieldChange = (i: number, key: string, value: string) => {
     const newFields = [...fields];
-    newFields[i][key] = value;
+    (newFields[i] as any)[key] = value;
     setFields(newFields);
   };
 
@@ -43,14 +56,31 @@ function CreateCard() {
     setError(null);
 
     try {
-      // Construir objeto con campos base y dinámicos
+      // Construir objeto con campos base y dinámicos y validar tipos
       const extra: Record<string, any> = {};
-      fields.forEach(f => {
+      for (const f of fields) {
         if (f.key) {
-          const num = Number(f.value);
-          extra[f.key] = !isNaN(num) && f.value.trim() !== '' ? num : f.value;
+          if (f.type === 'number') {
+            const num = Number(f.value);
+            if (isNaN(num)) {
+              setError(`El campo ${f.label || f.key} debe ser un número`);
+              setLoading(false);
+              return;
+            }
+            extra[f.key] = num;
+          } else if (f.type === 'date') {
+            // Validación básica de fecha
+            if (!/^\d{4}-\d{2}-\d{2}/.test(f.value)) {
+              setError(`El campo ${f.label || f.key} debe ser una fecha válida (YYYY-MM-DD)`);
+              setLoading(false);
+              return;
+            }
+            extra[f.key] = f.value;
+          } else {
+            extra[f.key] = f.value;
+          }
         }
-      });
+      }
       await createCard({
         title,
         description,
@@ -98,6 +128,16 @@ function CreateCard() {
             disabled={loading}
           />
         </div>
+        {/* Plantilla de atributos frecuentes */}
+        <div className="form-group">
+          <label>Plantilla de atributos frecuentes</label>
+          <select value={selectedTemplate} onChange={e => handleTemplateChange(e.target.value)} disabled={loading} style={{ marginLeft: 8 }}>
+            <option value="">Sin plantilla</option>
+            {cardTemplates.map(t => (
+              <option key={t.name} value={t.name}>{t.name}</option>
+            ))}
+          </select>
+        </div>
         {/* Campos dinámicos mejorados */}
         <div className="form-group">
           <label>Atributos personalizados</label>
@@ -109,17 +149,21 @@ function CreateCard() {
                 value={f.key}
                 onChange={e => handleFieldChange(i, 'key', e.target.value)}
                 required
-                disabled={loading}
+                disabled={loading || (!!selectedTemplate && !!cardTemplates.find(t => t.name === selectedTemplate)?.fields[i])}
+                style={f.type ? { fontWeight: 'bold' } : {}}
               />
               <input
-                type="text"
-                placeholder="Valor"
+                type={f.type || 'text'}
+                placeholder={f.label || 'Valor'}
                 value={f.value}
                 onChange={e => handleFieldChange(i, 'value', e.target.value)}
                 required
                 disabled={loading}
               />
-              <button type="button" onClick={() => removeField(i)} disabled={loading} style={{ color: 'red', fontWeight: 'bold' }}>X</button>
+              {/* Solo permite eliminar si no es de plantilla */}
+              {(!selectedTemplate || !cardTemplates.find(t => t.name === selectedTemplate)?.fields[i]) && (
+                <button type="button" onClick={() => removeField(i)} disabled={loading} style={{ color: 'red', fontWeight: 'bold' }}>X</button>
+              )}
             </div>
           ))}
           <button type="button" onClick={addField} disabled={loading} style={{ marginTop: 4 }}>
